@@ -16,10 +16,10 @@ pipeline {
     stages {
         stage('Get Code from repo') {
             steps {
-                git branch: 'main', url: 'https://github.com/Robert89111911/Frontend.git'
+                checkout scm    // git branch: 'main', url: 'https://github.com/Robert89111911/Frontend.git'
             }
         }
-        stage('Tests') {
+        stage('Unit Tests') {
             steps {
                 sh 'pip3 install -r requirements.txt'
                 sh 'python3 -m pytest --cov=. --cov-report xml:test-results/coverage.xml --junitxml=test-results/pytest-report.xml'
@@ -32,11 +32,11 @@ pipeline {
                 }
             }
         }
-        stage('Build application') {
+        stage('Build application image') {
             steps {
                 script {
                     dockerTag = "RC-${env.BUILD_ID}"
-                    applicationImage = docker.build("$imageName:$dockerTag",)
+                    applicationImage = docker.build("$imageName:$dockerTag",".")
                 }
             }
         }
